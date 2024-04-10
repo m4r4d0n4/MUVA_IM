@@ -4,7 +4,7 @@ from multiprocessing import Pool
 import os
 import matplotlib.pyplot as plt
 import dif_aniso as da
-def nonLocalMeans(noisy, params = tuple(), verbose = True):
+def nonLocalMeans(noisy, params = tuple(), verbose = True): ### REFERENCIA : https://github.com/praveenVnktsh/Non-Local-Means/blob/main/main.py
   '''
   Performs the non-local-means algorithm given a noisy image.
   params is a tuple with:
