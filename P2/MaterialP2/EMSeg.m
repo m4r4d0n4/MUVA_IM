@@ -1,4 +1,4 @@
-function [mask,mu,v,p]=EMSeg(ima,k)
+function [mask,mu,v,p]=EMSeg(ima,k,mu,v,p)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   Expectation Maximization image segmentation
@@ -21,6 +21,7 @@ function [mask,mu,v,p]=EMSeg(ima,k)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % check image
+tic;
 ima=double(ima);
 copy=ima;           % make a copy
 ima=ima(:);         % vectorize ima
@@ -36,12 +37,21 @@ x=find(h);
 h=h(x);
 x=x(:);h=h(:);
 
-% initiate parameters
+%% initiate parameters
+% Si los vectores de media, varianza y porporción no se especifican
+% como entrada, se inicialiazan
 
-mu=(1:k)*m/(k+1);
+if (nargin<3)
+    mu=(1:k)*m/(k+1);
+end
 
-v=ones(1,k)*m;
-p=ones(1,k)*1/k;
+if (nargin < 4)
+    v=ones(1,k)*m;
+end
+
+if (nargin < 5)
+    p=ones(1,k)*1/k;
+end 
 
 % start process
 
@@ -82,6 +92,12 @@ mu=mu+mi-1;   % recover real range
 s=size(copy);
 mask=zeros(s);
 
+
+% Obtener la probabilidad de pertenencia a cada clase basada en el histograma
+%probabilidad_clases = zeros(s(1), s(2), k);
+%for n = 1:k
+    %probabilidad_clases(:, :, n) = distribution(mu(n), v(n), p(n), copiar);
+%end
 for i=1:s(1),
 for j=1:s(2),
   for n=1:k
@@ -91,6 +107,7 @@ for j=1:s(2),
   mask(i,j)=a(1);
 end
 end
+
 
 
 function y=distribution(m,v,g,x)
@@ -111,10 +128,14 @@ ind=find(isnan(datos)==1);
 datos(ind)=0;
 ind=find(isinf(datos)==1);
 datos(ind)=0;
+
 tam=length(datos);
 m=ceil(max(datos))+1;
+
+
 h=zeros(1,m);
 for i=1:tam,
+    % tam = 201627
     f=floor(datos(i));    
     if(f>0 & f<(m-1))        
         a2=datos(i)-f;
@@ -127,7 +148,7 @@ h=conv(h,[1,2,3,2,1]);
 h=h(3:(length(h)-2));
 h=h/sum(h);
 
-
+toc;
 
 
 

@@ -24,8 +24,13 @@
 %
 % Coded by: Shawn Lankton (www.shawnlankton.com)
 %------------------------------------------------------------------------
-function seg = chanvese(I,init_mask,max_its,alpha,display)
-  
+function seg = chanvese(I,init_mask,max_its,alpha, thershold, max_area,display)
+
+% Nuevas entradas:
+%    thershold      Umbral para controlar la segmentación
+%    max_area       Máxima área del objeto segmentado
+
+%% NARGIN
   %-- default value for parameter alpha is .1
   if(~exist('alpha','var')) 
     alpha = .2; 
@@ -34,12 +39,20 @@ function seg = chanvese(I,init_mask,max_its,alpha,display)
   if(~exist('display','var'))
     display = true;
   end
+   if(~exist('threshold','var'))
+    threshold = 0.01;
+   end
+
   %-- ensures image is 2D double matrix
   I = im2graydouble(I);    
   
   %-- Create a signed distance map (SDF) from mask
   phi = mask2phi(init_mask);
   
+  %% Inicialización de las medias previas de interior y exterior
+  u0 = 0;
+  v0 = 0;
+
   %--main loop
   for its = 1:max_its   % Note: no automatic convergence test
 
@@ -50,6 +63,21 @@ function seg = chanvese(I,init_mask,max_its,alpha,display)
     vpts = find(phi>0);                  % exterior points
     u = sum(I(upts))/(length(upts)+eps); % interior mean
     v = sum(I(vpts))/(length(vpts)+eps); % exterior mean
+
+    %% Limitar el tamaño máximo de la región segmentada
+    area = length(upts);
+    if area > max_area
+        break;
+    end
+
+    %% Criterio de parada en función de puntos medidos
+    
+    if abs(u - u0) < thershold && abs(v - v0) < thershold
+        break;
+    end
+
+    u0 = u;
+    v0 = v;
     
     F = (I(idx)-u).^2-(I(idx)-v).^2;         % force from image information
     curvature = get_curvature(phi,idx);  % force from curvature penalty
@@ -195,9 +223,6 @@ function shift = shiftU(M)
   
 function S = sussman_sign(D)
   S = D ./ sqrt(D.^2 + 1);    
-
-  
-
 
 
 
