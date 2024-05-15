@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
+
 def nifti_to_opencv(image_path, index):
     # Cargar la imagen desde el archivo NIfTI
     imagen_nifti = nib.load(image_path)
