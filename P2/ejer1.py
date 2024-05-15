@@ -43,8 +43,8 @@ def region_grow(image, seed_coords, threshold_min, threshold_max):
                 queue.append((x + 1, y))
                 queue.append((x, y - 1))
                 queue.append((x, y + 1))
-        '''cv2.imshow("Mask", mask)
-        cv2.waitKey(1)'''
+        #cv2.imshow("Mask", mask)
+        #cv2.waitKey(1)
 
     return mask
 
