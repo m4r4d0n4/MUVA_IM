@@ -131,7 +131,5 @@ plt.title('Imagen Filtrada con Filtro Gaussiano')
 plt.axis('off')
 
 
-
-
 plt.show()
 
